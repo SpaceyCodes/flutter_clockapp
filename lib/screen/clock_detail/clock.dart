@@ -38,16 +38,14 @@ class ClockState extends State<Clock> {
   _caldisplaytime() {
     _temptime1 = _time;
     _temptime2 = (_temptime1 ~/ 60 ~/ 60);
-    developer.log(_temptime2.toString());
     if (_temptime2 < 10) {
       _tempStr = '0$_temptime2';
       _displayhoursTime = _tempStr;
     } else {
       _displayhoursTime = _temptime2.toString();
     }
-    _temptime1 = _temptime1 - (_temptime1 ~/ 360) * 360;
+    _temptime1 = _temptime1 - (_temptime1 ~/ 3600) * 3600;
     _temptime2 = (_temptime1 ~/ 60);
-    developer.log(_temptime2.toString());
     if (_temptime2 < 10) {
       _tempStr = '0$_temptime2';
       _displayminutesTime = _tempStr;
@@ -56,7 +54,6 @@ class ClockState extends State<Clock> {
     }
     _temptime1 = _temptime1 - (_temptime1 ~/ 60) * 60;
     _temptime2 = (_temptime1);
-    developer.log(_temptime2.toString());
     if (_temptime2 < 10) {
       _tempStr = '0$_temptime2';
       _displaysecondsTime = _tempStr;
