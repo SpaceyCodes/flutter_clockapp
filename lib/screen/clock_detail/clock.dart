@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'select_time.dart';
+import 'select_time_hours.dart';
+import 'select_time_minutes.dart';
+import 'select_time_seconds.dart';
 import 'dart:async';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'dart:developer' as developer;
@@ -10,18 +12,88 @@ class Clock extends StatefulWidget {
 }
 
 class ClockState extends State<Clock> {
-  static int time = 4;
+  static int secondsTime = 0;
+  static int minutesTime = 0;
+  static int hoursTime = 0;
+  String _displaysecondsTime = '00';
+  String _displayminutesTime = '00';
+  String _displayhoursTime = '00';
+  int _temptime1 = 0;
+  int _temptime2 = 0;
+  String _tempStr;
+  double _opacity = 1.0;
+  double _opacitytime = 0.0;
+  bool _ignore = false;
+  int _time = 0;
   int _orginalTime = 5;
   int _firstcycle = 0;
   bool _starter;
   Timer _timer;
   Icon _currenticon = Icon(Icons.play_arrow);
-  void _stoptimer() {
-    _timer.cancel();
+  _caltime() {
+    _time = (secondsTime) + (minutesTime * 60) + (hoursTime * 60 * 60);
+    return _time;
+  }
+
+  _caldisplaytime() {
+    _temptime1 = _time;
+    _temptime2 = (_temptime1 ~/ 60 ~/ 60);
+    developer.log(_temptime2.toString());
+    if (_temptime2 < 10) {
+      _tempStr = '0$_temptime2';
+      _displayhoursTime = _tempStr;
+    } else {
+      _displayhoursTime = _temptime2.toString();
+    }
+    _temptime1 = _temptime1 - (_temptime1 ~/ 360) * 360;
+    _temptime2 = (_temptime1 ~/ 60);
+    developer.log(_temptime2.toString());
+    if (_temptime2 < 10) {
+      _tempStr = '0$_temptime2';
+      _displayminutesTime = _tempStr;
+    } else {
+      _displayminutesTime = _temptime2.toString();
+    }
+    _temptime1 = _temptime1 - (_temptime1 ~/ 60) * 60;
+    _temptime2 = (_temptime1);
+    developer.log(_temptime2.toString());
+    if (_temptime2 < 10) {
+      _tempStr = '0$_temptime2';
+      _displaysecondsTime = _tempStr;
+    } else {
+      _displaysecondsTime = _temptime2.toString();
+    }
     setState(() {
-      time = _orginalTime;
-      _currenticon = Icon(Icons.play_arrow);
+      _displayhoursTime;
+      _displayminutesTime;
+      _displaysecondsTime;
     });
+  }
+
+  _changestate() {
+    if (_opacity == 1.0) {
+      setState(() {
+        _opacity = 0.4;
+        _ignore = true;
+      });
+    } else {
+      _opacity = 1.0;
+      _ignore = false;
+    }
+  }
+
+  void _stoptimer() {
+    if (_firstcycle == 1) {
+      _timer.cancel();
+      setState(() {
+        _opacitytime = 0.0;
+        _changestate();
+        _time = _orginalTime;
+        _caldisplaytime();
+        _firstcycle = 0;
+        _currenticon = Icon(Icons.play_arrow);
+      });
+    }
   }
 
   void _startTimer() {
@@ -38,38 +110,58 @@ class ClockState extends State<Clock> {
       _timer.cancel();
     } else {
       if (_firstcycle == 0) {
-        _orginalTime = time;
+        _changestate();
+        _time = _caltime();
+        _orginalTime = _time;
         _firstcycle = 1;
       }
+      _caldisplaytime();
       setState(() {
         _currenticon = Icon(Icons.pause);
-        time;
+        _time;
+        _opacitytime = 1.0;
       });
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        setState(() {
-          if (time > 0) {
-            time--;
-          } else {
+        if (_time > 0) {
+          _time--;
+          _caldisplaytime();
+        } else {
+          setState(() {
             FlutterRingtonePlayer.play(
               android: AndroidSounds.notification,
               ios: IosSounds.glass,
-              looping: false,
+              looping: true,
               volume: 0.5,
             );
+            showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => AlertDialog(
+                      title: Text("Time's up"),
+                      actions: <Widget>[
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              FlutterRingtonePlayer.stop();
+                            },
+                            child: Text('Stop'))
+                      ],
+                    ));
             _currenticon = Icon(Icons.play_arrow);
             _firstcycle = 0;
+            _changestate();
             _timer.cancel();
+            _opacitytime = 0.0;
             _resetTimer();
-          }
-        });
+          });
+        }
       });
     }
   }
 
   void _resetTimer() {
-    setState(() {
-      time = _orginalTime;
-    });
+    _time = _orginalTime;
+    _caldisplaytime();
   }
 
   @override
@@ -77,23 +169,34 @@ class ClockState extends State<Clock> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('Set: $time'),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SelectTimeSeconds(),
+        Opacity(
+            opacity: _opacitytime,
+            child: Text(
+              '$_displayhoursTime $_displayminutesTime $_displaysecondsTime',
+              style: TextStyle(fontSize: 25),
+            )),
+        Opacity(
+          opacity: _opacity,
+          child: IgnorePointer(
+            ignoring: _ignore,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: SelectTimeHours(),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: SelectTimeMinutes(),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: SelectTimeSeconds(),
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SelectTimeSeconds(),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SelectTimeSeconds(),
-            ),
-          ],
+          ),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

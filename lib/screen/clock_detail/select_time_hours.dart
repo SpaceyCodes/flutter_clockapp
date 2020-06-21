@@ -1,18 +1,17 @@
 import 'package:clockapp/screen/clock_detail/clock.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
 
-class SelectTimeSeconds extends StatefulWidget {
+class SelectTimeHours extends StatefulWidget {
   @override
-  SelectTimeSecondsState createState() => SelectTimeSecondsState();
+  SelectTimeHoursState createState() => SelectTimeHoursState();
 }
 
-class SelectTimeSecondsState extends State<SelectTimeSeconds> {
+class SelectTimeHoursState extends State<SelectTimeHours> {
   String dropdownValue = '00';
   String loly;
-  Seconds() {
-    List<String> intlister = new List(61);
-    for (var i = 0; i < 61; i++) {
+  _Seconds() {
+    List<String> intlister = new List(100);
+    for (var i = 0; i < 100; i++) {
       if (i < 10) {
         loly = '0$i';
         intlister[i] = loly;
@@ -37,10 +36,10 @@ class SelectTimeSecondsState extends State<SelectTimeSeconds> {
       onChanged: (String newValue) {
         setState(() {
           dropdownValue = newValue;
-          ClockState.time = int.parse(newValue);
+          ClockState.hoursTime = int.parse(newValue);
         });
       },
-      items: Seconds().map<DropdownMenuItem<String>>((String value) {
+      items: _Seconds().map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
