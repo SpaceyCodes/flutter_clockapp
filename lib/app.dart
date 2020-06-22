@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screen/clock_detail/clock_detail.dart';
+import 'screen/stopwatch/stopwatch_detail.dart';
 import 'package:colorful_safe_area/colorful_safe_area.dart';
 
 class App extends StatelessWidget {
@@ -45,7 +46,7 @@ class App extends StatelessWidget {
               ),
               body: TabBarView(children: [
                 Clock_detail(),
-                Clock_detail(),
+                Stopwatch_detail(),
               ]),
             ),
           ),

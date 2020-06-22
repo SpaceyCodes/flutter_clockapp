@@ -169,7 +169,7 @@ class ClockState extends State<Clock> {
         Opacity(
             opacity: _opacitytime,
             child: Text(
-              '$_displayhoursTime $_displayminutesTime $_displaysecondsTime',
+              '$_displayhoursTime:$_displayminutesTime:$_displaysecondsTime',
               style: TextStyle(fontSize: 25),
             )),
         Opacity(
@@ -215,6 +215,9 @@ class ClockState extends State<Clock> {
               },
             ),
           ],
+        ),
+        Container(
+          height: 250,
         ),
       ],
     );
