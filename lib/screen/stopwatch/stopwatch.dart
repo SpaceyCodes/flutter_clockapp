@@ -66,8 +66,12 @@ class StopwatchState extends State<Stopwatch> {
     }
     if (_starter) {
       _stopwatchTimer.cancel();
+      setState(() {
+        _currentIcon = Icon(Icons.play_arrow);
+      });
     } else {
       setState(() {
+        _currentIcon = Icon(Icons.pause);
         _ignore = false;
         _opacity = 1.0;
       });
@@ -86,6 +90,7 @@ class StopwatchState extends State<Stopwatch> {
     listlap = [];
     _lapNumber = 0;
     setState(() {
+      _currentIcon = Icon(Icons.play_arrow);
       _ignore = true;
       _opacity = 0.3;
     });
